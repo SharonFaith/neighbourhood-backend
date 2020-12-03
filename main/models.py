@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
 from cloudinary.models import CloudinaryField
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 # Create your models here.
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=255, blank=True)
