@@ -25,6 +25,11 @@ class Comment(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField(null=True)
 
+class Category(models.Model):
+    category_name = models.IntegerField(primary_key=True)
+
+
+
 
 
 
