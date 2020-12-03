@@ -57,20 +57,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     city_town = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
    # neighbourhood_id = models.ForeignKey()
-    system_admin = models.BooleanField(default=False)
-    neighbourhood_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
-    @property
-    def is_superuser(self):
-        status=self.system_admin
-        return status
-    @property
-    def is_staff(self):
-        status = self.neighbourhood_admin
-        return status
+   # @property
+   # def is_superuser(self):
+    #    status=self.system_admin
+    #    return status
+    #@property
+    #def is_staff(self):
+     #   status = self.neighbourhood_admin
+     #   return status
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
