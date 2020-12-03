@@ -6,6 +6,21 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 class CustomUserManager(BaseUserManager):
 
+
+    def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
+        other_fields.setdefault('is_staff', True)
+        other_fields.serdefault('is_superuser', True)
+        other_fields.serdefault('is_active', True)
+
+        if other_fields.get('is_staff') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True')
+        if other_fields.get('is_susperuser') is not True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True')        
+
+        return self.create_user(email, username, first_name, last_name, password, **other_fields)
+
     def create_user(self, email, username, first_name, last_name, password, local_area, city_town, country, **other_fields):
         if not email:
             raise ValueError('You must provide an email address ')
@@ -33,19 +48,7 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
-        other_fields.setdefault('is_staff', True)
-        other_fields.serdefault('is_superuser', True)
-        other_fields.serdefault('is_active', True)
-
-        if other_fields.get('is_staff') is not True:
-            raise ValueError(
-                'Superuser must be assigned to is_staff=True')
-        if other_fields.get('is_susperuser') is not True:
-            raise ValueError(
-                'Superuser must be assigned to is_superuser=True')        
-
-        return self.create_user(email, username, first_name, last_name, password, **other_fields)
+  
 
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255, blank=True)
@@ -53,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(gettext_lazy('email address'),max_length=255, unique=True)
     #password = models.CharField()
-    profile_pic = models.CloudinaryField(blank=True, null=True)
+    profile_pic = CloudinaryField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True, max_length=255)
     local_area = models.CharField(max_length=255)
     city_town = models.CharField(max_length=255)
@@ -62,6 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     system_admin = models.BooleanField(default=False)
     neighbourhood_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
 
     @property
     def is_superuser(self):

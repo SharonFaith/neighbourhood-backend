@@ -207,3 +207,4 @@ LOGGING = {
         },
     },
 }
+AUTH_USER_MODEL = 'main.User'
