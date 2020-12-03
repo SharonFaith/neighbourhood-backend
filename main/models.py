@@ -19,6 +19,15 @@ class Service(models.Model):
     email = models.EmailField(max_length=255)
     description = models.TextField(null=True)
 
+class Comment(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    post_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    posted_at = models.DateTimeField(auto_now_add=True)
+    content = models.TextField(null=True)
+
+
+
+
 
 
 
