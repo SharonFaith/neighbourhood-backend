@@ -9,19 +9,19 @@ class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
         other_fields.setdefault('is_staff', True)
-        other_fields.serdefault('is_superuser', True)
-        other_fields.serdefault('is_active', True)
+        other_fields.setdefault('is_superuser', True)
+        other_fields.setdefault('is_active', True)
 
         if other_fields.get('is_staff') is not True:
             raise ValueError(
                 'Superuser must be assigned to is_staff=True')
-        if other_fields.get('is_susperuser') is not True:
+        if other_fields.get('is_superuser') is not True:
             raise ValueError(
                 'Superuser must be assigned to is_superuser=True')        
 
         return self.create_user(email, username, first_name, last_name, password, **other_fields)
 
-    def create_user(self, email, username, first_name, last_name, password, local_area, city_town, country, **other_fields):
+    def create_user(self, email, username, first_name, last_name, password, **other_fields):
         if not email:
             raise ValueError('You must provide an email address ')
         if not username:
@@ -32,12 +32,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('You must provide your last_name')
         if not password:
             raise ValueError('Password is required')
-        if not local_area:
-            raise ValueError('You must specify your local area')
-        if not city_town:
-            raise ValueError('You must specify your city/town')
-        if not country:
-            raise ValueError('You must specify your neighbourhood')
+        
         
         
         email = self.normalize_email(email)
@@ -58,9 +53,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     #password = models.CharField()
     profile_pic = CloudinaryField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True, max_length=255)
-    local_area = models.CharField(max_length=255)
-    city_town = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
+    local_area = models.CharField(max_length=255, blank=True, null=True)
+    city_town = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
    # neighbourhood_id = models.ForeignKey()
     system_admin = models.BooleanField(default=False)
     neighbourhood_admin = models.BooleanField(default=False)
@@ -78,7 +73,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return status
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return self.username
