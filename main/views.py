@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 # from .permissions import IsAdminOrReadOnly
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import UserSerializer
@@ -53,8 +53,6 @@ class UserLogin(APIView):
             return Response(data = token)
         return Response({'failed': 'not authorized'})
 
-        
-
 class UserList(APIView):
     permission_classes = (AllowAny,)
 
@@ -63,6 +61,18 @@ class UserList(APIView):
         serializers = UserSerializer(all_users, many=True)
         return Response(serializers.data)
 
+
+class Hood(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+    def patch(self, request):
+        pass
 
 def activate_account(request, uid, token):
     User = get_user_model()

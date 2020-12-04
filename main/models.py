@@ -11,8 +11,11 @@ class Hood(models.Model):
     local_area = models.CharField(max_length=255)
     city_town = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
-    # occupants = models.PositiveSmallIntegerField(null=True)
-    #hood_admin = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    @property
+    def occupants(self):
+        users = len(self.users.all())
+        return users
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, first_name, last_name, password, **other_fields):
@@ -56,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     local_area = models.CharField(max_length=255, blank=True, null=True)
     city_town = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True)
+    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True, related_name='users')
     date_registered = models.DateTimeField(auto_now = True)
 
     # For the system admin
