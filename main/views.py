@@ -14,7 +14,15 @@ from .email.token import activation_token
 from .email.activation_email import send_activation_email
 import requests
 from django.contrib.sites.shortcuts import get_current_site
+from rest_framework_simplejwt.tokens import RefreshToken
 
+
+def get_tokens(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 def welcome(request):
 
@@ -41,7 +49,8 @@ class UserLogin(APIView):
         user = User.objects.filter(username = username).first()
 
         if user is not None and user.check_password(password):
-            return Response({'success':'Logged in'})
+            token = get_tokens(user)
+            return Response(data = token)
         return Response({'failed': 'not authorized'})
 
         
