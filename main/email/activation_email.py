@@ -1,5 +1,5 @@
 import os
-
+from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -16,6 +16,7 @@ def send_activation_email(request, user):
         to_emails=user.email,
         subject="Account Activation",
         html_content=render_to_string('emails/activation_email.html', {
+            'domain': get_current_site(request),
             'user': user,
             'uid': urlsafe_base64_encode(force_bytes(user.id)),
             'token': activation_token.make_token(user)

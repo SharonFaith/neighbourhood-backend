@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.translation import gettext_lazy
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password
@@ -48,16 +47,16 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, username, first_name, last_name, password, **other_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=255, blank=True)
+    first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, unique=True)
-    email = models.EmailField(gettext_lazy('email address'),max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
     profile_pic = CloudinaryField(blank=True, null=True)
     bio = models.TextField(blank=True, null=True, max_length=255)
     local_area = models.CharField(max_length=255, blank=True, null=True)
     city_town = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True, related_name='users')
+    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True)
     date_registered = models.DateTimeField(auto_now = True)
 
     # For the system admin
@@ -72,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    # REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return self.username
