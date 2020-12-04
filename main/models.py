@@ -1,14 +1,22 @@
 from django.db import models
-import datetime as dt
+#import datetime as dt
 from django.utils.translation import gettext_lazy
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.contrib.auth.hashers import make_password
-# Create your models here.
+
+
+
+
+class Hood(models.Model):
+    name = models.CharField(max_length=255)
+    local_area = models.CharField(max_length=255)
+    city_town = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    # occupants = models.PositiveSmallIntegerField(null=True)
+    #hood_admin = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class CustomUserManager(BaseUserManager):
-
-
     def create_user(self, email, username, first_name, last_name, password, **other_fields):
         if not email:
             raise ValueError('You must provide an email address ')
@@ -21,19 +29,13 @@ class CustomUserManager(BaseUserManager):
         if not password:
             raise ValueError('Password is required')
         
-        
-        
         email = self.normalize_email(email)
-
         user = self.model(email = email, username = username, first_name=first_name, last_name=last_name,
                          password=password, **other_fields)
         #user.setpassword(password)
         user.set_password(password)
         user.save()
         return user
-
-
-
     def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
@@ -46,8 +48,6 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, username, first_name, last_name, password, **other_fields)
 
-  
-
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255)
@@ -58,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     local_area = models.CharField(max_length=255, blank=True, null=True)
     city_town = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
-    hood = models.ForeignKey(Hood, on_delete=models.CASCADE)
+    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True, related_name='users')
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
@@ -70,14 +70,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
-class Hood(models.Model):
-    name = models.CharField(max_length=255)
-    local_area = models.CharField(max_length=255)
-    city_town = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
-    occupants = models.PositiveSmallIntegerField(null=True)
-    Hood_admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
