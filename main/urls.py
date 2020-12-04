@@ -7,5 +7,5 @@ from .views import welcome
 
 urlpatterns = [
     path('', welcome, name='welcome'),
-    path('api/users', views.UserList.as_view())
+    path('api/users/', views.UserList.as_view())
 ]
