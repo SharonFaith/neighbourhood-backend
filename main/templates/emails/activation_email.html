@@ -1,0 +1,9 @@
+<h1>Welcome to the Hood!</h1>
+<p>
+  Hello, {{user.first_name}}. Your username is {{user.username}} Thanks joining the Hood. Click the link below to activate your account.
+</p>
+<p>
+  <a href="{% url 'activation_email' uid token %}">
+    <strong>Activate your account</strong>
+  </a>
+</p>

@@ -1,5 +1,4 @@
 from django.db import models
-#import datetime as dt
 from django.utils.translation import gettext_lazy
 from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -59,8 +58,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     city_town = models.CharField(max_length=255, blank=True, null=True)
     country = models.CharField(max_length=255, blank=True, null=True)
     hood = models.ForeignKey(Hood, on_delete=models.CASCADE, null=True, related_name='users')
+    date_registered = models.DateTimeField(auto_now = True)
+
+    # For the system admin
     is_superuser = models.BooleanField(default=False)
+
+    # For the hood admin
     is_staff = models.BooleanField(default=False)
+
+    # For normal user, system admin, and hood admin
     is_active = models.BooleanField(default=False)
 
     objects = CustomUserManager()
