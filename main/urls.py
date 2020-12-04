@@ -8,5 +8,7 @@ from .views import welcome
 urlpatterns = [
     path('', welcome, name='welcome'),
     path('api/users/', views.UserList.as_view()),
-    path('api/auth/signup/', views.UserSignUp.as_view())
+    path('activate-account/<uid>/<token>/', views.activate_account, name='activation_email'),
+    path('api/auth/signup/', views.UserSignUp.as_view(), name='signup' ),
+    path('api/auth/login/', views.UserLogin.as_view(), name='login'),
 ]
