@@ -4,7 +4,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer
+from .serializer import UserSerializer, SignUpSerializer
 from rest_framework import status
 from .models import User
 from django.contrib.auth import get_user_model, login
@@ -16,6 +16,18 @@ import requests
 def welcome(request):
 
    return redirect('api/users')
+
+class UserSignUp(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format = None):
+        serializers = SignUpSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserList(APIView):
     permission_classes = (AllowAny,)
