@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 
 
 class Hood(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     local_area = models.CharField(max_length=255)
     city_town = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
@@ -16,6 +16,9 @@ class Hood(models.Model):
     def occupants(self):
         users = len(self.users.all())
         return users
+
+    def __str__(self):
+        return self.name
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, first_name, last_name, password, **other_fields):

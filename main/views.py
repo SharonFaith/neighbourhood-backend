@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-# from .permissions import IsAdminOrReadOnly
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from .permissions import IsSuperuser, IsActivatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer
+from .serializer import UserSerializer, HoodSerializer
 from rest_framework import status
-from .models import User
+from .models import User, Hood
 from django.contrib.auth import get_user_model, login
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -15,6 +15,7 @@ from .email.activation_email import send_activation_email
 import requests
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 
 def get_tokens(user):
@@ -61,17 +62,45 @@ class UserList(APIView):
         serializers = UserSerializer(all_users, many=True)
         return Response(serializers.data)
 
-
-class Hood(APIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+class SingleUser(APIView):
+    permission_classes=(IsAuthenticated,)
 
     def get(self, request):
-        pass
+        if request.GET.get('user_id', None):
+            user_id = request.GET.get('user_id')
+            user = User.objects.filter(id = user_id).first()
+            if user is not None:
+                serializer = UserSerializer(user)
+                return Response(serializer.data)
+        return Response(data={'status':'failed'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HoodList(APIView):
+    permission_classes = (IsActivatedOrReadOnly,)
+
+    def get(self, request):
+        if request.GET.get('hood_id'):
+            hood_id = request.GET.get('hood_id')
+            hood = Hood.objects.filter(id = hood_id).first()
+            users = hood.users.all()
+            if request.user in users:
+                serializer = HoodSerializer(hood)
+                return Response(serializer.data)
+        hoods = Hood.objects.all()
+        serializers = HoodSerializer(hoods, many=True)
+        return Response(serializers.data)
 
     def post(self, request):
-        pass
+        serializer = HoodSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
+        pass
+
+    def delete(self, request):
         pass
 
 def activate_account(request, uid, token):

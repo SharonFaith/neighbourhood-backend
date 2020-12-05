@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import Hood
 
 User = get_user_model()
 
@@ -17,3 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+class HoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hood
+        fields = '__all__'

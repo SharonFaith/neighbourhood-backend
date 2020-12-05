@@ -11,4 +11,7 @@ urlpatterns = [
     path('activate-account/<uid>/<token>/', views.activate_account, name='activation_email'),
     path('api/auth/signup/', views.UserSignUp.as_view(), name='signup' ),
     path('api/auth/login/', views.UserLogin.as_view(), name='login'),
+    path('api/v1/hoods/', views.HoodList.as_view(), name='hoods'),
+    path('api/v1/user/', views.SingleUser.as_view(), name='single_user')
+
 ]
