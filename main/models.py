@@ -41,6 +41,14 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
     def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
+
+        if not username:
+            raise ValueError('Username is required')
+        if not first_name:
+            raise ValueError('You must provide your first_name')
+        if not last_name:
+            raise ValueError('You must provide your last_name')
+        
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
         other_fields.setdefault('is_active', True)
@@ -77,7 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    # REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return self.username

@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
 class HoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hood

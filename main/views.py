@@ -68,6 +68,7 @@ class SingleUser(APIView):
     def get(self, request):
         if request.GET.get('user_id', None):
             user_id = request.GET.get('user_id')
+            
             user = User.objects.filter(id = user_id).first()
             if user is not None:
                 serializer = UserSerializer(user)
@@ -90,6 +91,9 @@ class HoodList(APIView):
         serializers = HoodSerializer(hoods, many=True)
         return Response(serializers.data)
 
+class CreateHood(APIView):
+    permission_classes = (IsSuperuser,)
+
     def post(self, request):
         serializer = HoodSerializer(data=request.data)
         if serializer.is_valid():
@@ -97,11 +101,71 @@ class HoodList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request):
-        pass
+class ManageHood(APIView):
+    permission_classes = (IsSuperuser,)
 
-    def delete(self, request):
-        pass
+    def get_user(self, pk):
+
+        try:
+            return User.objects.get(pk=pk)
+            
+        except User.DoesNotExist:
+            raise Http404()
+
+    def patch(self, request, pk):
+        user = self.get_user(pk)
+        serializer = UserSerializer(user, request.data) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class OneHood(APIView):
+    permission_classes = (IsSuperuser,)
+
+    def get_hood(self, pk):
+
+        try:
+            return Hood.objects.get(pk=pk)
+            
+        except Hood.DoesNotExist:
+            raise Http404()
+            
+
+    def get(self, request, pk, format=None):
+        
+            hood = self.get_hood(pk)
+
+            serializers = HoodSerializer(merch)
+            return Response(serializers.data)
+       
+    def put(self, request, pk, format=None):
+        hood = self.get_hood(pk)
+        serializers = HoodSerializer(hood, request.data)
+
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        else:
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        hood = self.get_hood(pk)
+        hood.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    
+    def patch(self, request, pk):
+        hood = self.get_object(pk)
+        serializer = HoodSerializer(hood, request.data) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 def activate_account(request, uid, token):
     User = get_user_model()
