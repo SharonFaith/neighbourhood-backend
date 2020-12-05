@@ -20,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+
 class HoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hood

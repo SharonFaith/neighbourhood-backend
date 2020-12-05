@@ -13,9 +13,11 @@ urlpatterns = [
     path('api/auth/login/', views.UserLogin.as_view(), name='login'),
     path('api/v1/hoods/', views.HoodList.as_view(), name='hoods'),
     path('api/v1/user/', views.SingleUser.as_view(), name='single_user'),
-    re_path(r'api/v1/view_hood/(?P<pk>[0-9]+)/', views.OneHood.as_view(), name='one_hood'),
+    path('api/v1/view_hood/', views.OneHood.as_view(), name='one_hood'),
     path('api/v1/create_hood/', views.CreateHood.as_view(), name='create_hood'),
-    re_path(r'api/v1/manage_hood/(?P<pk>[0-9]+)/', views.ManageHood.as_view(), name='appoint_hood_admin'),
+    #re_path(r'api/v1/manage_hood/(?P<pk>[0-9]+)/', views.ManageHood.as_view(), name='appoint_hood_admin'),
+    
+    path('api/v1/manage_hood/', views.ManageHood.as_view(), name='appoint_hood_admin'),
     path('api/v1/edit_hood/', views.OneHood.as_view(), name='edit-hood')
 ]
 
