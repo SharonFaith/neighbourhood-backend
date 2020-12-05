@@ -112,13 +112,21 @@ class ManageHood(APIView):
         except User.DoesNotExist:
             raise Http404()
 
-    # def patch(self, request, pk):
-    #     user = self.get_user(pk)
-    #     serializer = UserSerializer(user, request.data) 
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, pk, format=None):
+        
+        user = self.get_user(pk)
+
+        serializers = UserSerializer(user)
+        return Response(serializers.data)
+
+    def patch(self, request, pk):
+        user = self.get_user(pk)
+        print(user)
+        serializer = UserSerializer(user, request.data) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
