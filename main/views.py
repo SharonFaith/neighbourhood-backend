@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer, PostSerializer, ManageHoodSerializer
 from .serializer import ServiceSerializer, CategorySerializer, CommentSerializer
 from rest_framework import status
-from .models import User, Hood, Post
+from .models import User, Hood, Post, Comment, Category, Service
 from django.contrib.auth import get_user_model, login
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -303,7 +303,7 @@ class JoinHood(APIView):
 
            
 class PostList(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         
@@ -320,10 +320,31 @@ class AddPost(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#add delete post if the user id in the request is the same as the user id in the post. same for comments.
+# services and categories - neighbourhood admin(+superuser) has crud functionality, other users have read only according to their neighbourhood
+class ListServices(APIView):
+    permission_classes = (AllowAny,)
 
+    def get(self, request):
+        service = Service.objects.all()
+        serializers = ServiceSerializer(service, many=True)
+        return Response(serializers.data)
 
+class ListCategories(APIView):
+    permission_classes = (AllowAny,)
 
+    def get(self, request):
+        categories = Category.objects.all()
+        serializers = CategorySerializer(categories, many=True)
+        return Response(serializers.data)
 
+class ListComments(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializers = CommentSerializer(comments, many=True)
+        return Response(serializers.data)
 
 
 def activate_account(request, uid, token):
