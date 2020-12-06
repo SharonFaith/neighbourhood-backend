@@ -91,8 +91,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    hood = models.ForeignKey(Hood,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    hood = models.ForeignKey(Hood,on_delete=models.CASCADE, related_name='hood_posts')
     content = models.TextField(max_length=400, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
 
@@ -101,15 +101,15 @@ class Category(models.Model):
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    hood = models.ForeignKey(Hood, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='services')
+    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, related_name='hood_services')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services_owned')
     email = models.EmailField(max_length=255)
     description = models.TextField(null=True)
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     posted_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField(null=True)
 
