@@ -18,6 +18,6 @@ urlpatterns = [
     #re_path(r'api/v1/manage_hood/(?P<pk>[0-9]+)/', views.ManageHood.as_view(), name='appoint_hood_admin'),
     
     path('api/v1/manage_hood/', views.ManageHood.as_view(), name='appoint_hood_admin'),
-    path('api/v1/edit_hood/', views.OneHood.as_view(), name='edit-hood')
+    #path('api/v1/edit_hood/', views.OneHood.as_view(), name='edit-hood')
 ]
 

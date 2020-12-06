@@ -83,13 +83,7 @@ class HoodList(APIView):
     permission_classes = (IsActivatedOrReadOnly,)
 
     def get(self, request):
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            hood = Hood.objects.filter(id = hood_id).first()
-            users = hood.users.all()
-            if request.user in users:
-                serializer = HoodSerializer(hood)
-                return Response(serializer.data)
+        
         hoods = Hood.objects.all()
         serializers = HoodSerializer(hoods, many=True)
         return Response(serializers.data)
@@ -115,40 +109,56 @@ class CreateHood(APIView):
             hood_id = request.GET.get('hood_id')
                 
             return Hood.objects.filter(id = hood_id).first()
-        except User.DoesNotExist:
+        except Hood.DoesNotExist:
             raise Http404()
 
     def get(self, request):
-        
+        if request.GET.get('hood_id', None):
+            hood_id = request.GET.get('hood_id')
             hood = self.get_hood(request)
-
-            serializers = HoodSerializer(hood)
-            return Response(serializers.data)
+            print(hood)
+            if hood != None:
+                serializers = HoodSerializer(hood)
+                print(serializers.data)
+                return Response(serializers.data)
+            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+                    
+           
        
     def put(self, request):
-        hood = self.get_hood(request)
-        serializers = HoodSerializer(hood, request.data)
+        if request.GET.get('hood_id', None):
+            hood = self.get_hood(request)
+            if hood != None:
+                serializers = HoodSerializer(hood, request.data)
 
-        if serializers.is_valid():
-            serializers.save()
-            return Response(serializers.data)
-        else:
-            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-
+                if serializers.is_valid():
+                    serializers.save()
+                    return Response(serializers.data)
+                else:
+                    return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
     def delete(self, request):
-        hood = self.get_hood(request)
-        hood.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+        if request.GET.get('hood_id', None):
+            hood = self.get_hood(request)
+            if hood != None:
+                hood.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
     
     def patch(self, request):
-        hood = self.get_object(request)
-        serializer = HoodSerializer(hood, request.data) 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        if request.GET.get('hood_id', None):
+            hood = self.get_hood(request)
+            if hood != None:
+                serializer = HoodSerializer(hood, request.data, partial=True) 
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+                return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
