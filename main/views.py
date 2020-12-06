@@ -15,7 +15,7 @@ from .email.activation_email import send_activation_email
 import requests
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
-
+import json
 
 
 def get_tokens(user):
@@ -45,13 +45,15 @@ class UserLogin(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        print(json.loads(request.body))
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
         user = User.objects.filter(username = username).first()
 
         if user is not None and user.check_password(password):
             token = get_tokens(user)
-            return Response(data = token)
+            return Response(data=token)
         return Response({'failed': 'not authorized'})
 
 class UserList(APIView):
@@ -206,20 +208,23 @@ class OneHood(APIView):
         
         user_id = request.GET.get('user_id')
         user = User.objects.filter(id = user_id).first()
-        serializer = HoodSerializer(data=hood)
+        serializer = UserSerializer(user)
+        user = serializer.data
+        print(user)
+       
+        
+        
 
-
-        print(user.hood.id)
+        #print(user.hood.id)
         if serializer.is_valid():
             if user != None:
                 if user.hood == None:
                     return Response({'detail':'unauthorized'}, status =status.HTTP_400_BAD_REQUEST)
-                elif user.hood == hood.id:
+                elif user.hood.id == hood.id:
                     
-                        
 
                     
-                    return Response(serializer.data)
+                    return Response(user.hood_details)
                 else: 
                     return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
                 
