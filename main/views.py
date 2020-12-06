@@ -217,30 +217,37 @@ class OneHood(APIView):
             raise Http404()
 
     def get(self, request):
-        
+        if request.GET.get('hood_id', None):
+            
+            
             hood = self.get_hood(request)
-            print(hood.id)
-
             
+            if hood != None:
             
-            user_id = request.GET.get('user_id')
-            user = User.objects.filter(id = user_id).first()
-            print(user)
-            serializer = UserSerializer(user)
+                if request.GET.get('user_id', None):
             
-            if user != None:
-                if user.hood == None:
-                    return Response({'detail':'unauthorized'}, status =status.HTTP_400_BAD_REQUEST)
-                elif user.hood.id == hood.id:
-                    user = serializer.data
-
+                    user_id = request.GET.get('user_id', None)
+                    user = User.objects.filter(id = user_id).first()
+                    print(user)
                     
-                    return Response(user['hood_details'])
-                else: 
-                    return Response({'status':'failed'}, status=status.HTTP_401_UNAUTHORIZED)
-                
             
-            return Response({'status':'failed'}, status =status.HTTP_400_BAD_REQUEST)
+                    if user != None:
+                        serializer = UserSerializer(user)
+                        if user.hood == None:
+                            return Response({'detail':'unauthorized'}, status =status.HTTP_400_BAD_REQUEST)
+                        elif user.hood.id == hood.id:
+                            user = serializer.data
+
+                            
+                            return Response(user['hood_details'])
+                        else: 
+                            return Response({'status':'failed'}, status=status.HTTP_401_UNAUTHORIZED)
+                        
+            
+                    return Response({'detail':'no user with that id'}, status =status.HTTP_400_BAD_REQUEST)
+                return Response({'detail':'no user id provided'}, status =status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no hood with that id'}, status =status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no hood id provided'}, status =status.HTTP_400_BAD_REQUEST)
 
 class EditProfile(APIView):
     permission_classes = (IsAuthenticated,)
