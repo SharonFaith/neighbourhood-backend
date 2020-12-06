@@ -353,14 +353,24 @@ class HoodPosts(APIView):
             return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
         return Response({'status':'no data'}, status =status.HTTP_400_BAD_REQUEST)
 
-class AddPost(APIView):
-    permission_classes = (IsActivatedOrReadOnly,)
+# class AddPost(APIView):
+#     permission_classes = (IsActivatedOrReadOnly,)
+#     def post(self, request):
+#         serializer = PostSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AddCategory(APIView):
+    permission_classes = (AllowAny,)
     def post(self, request):
-        serializer = PostSerializer(data=request.data)
+        serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ListServices(APIView):
     permission_classes = (AllowAny,)

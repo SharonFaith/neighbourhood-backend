@@ -97,7 +97,7 @@ class Post(models.Model):
     posted_at = models.DateTimeField(auto_now_add=True)
 
 class Category(models.Model):
-    category_name = models.IntegerField(primary_key=True)
+    category_name = models.CharField(primary_key=True, max_length=255)
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
