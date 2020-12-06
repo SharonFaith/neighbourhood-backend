@@ -4,7 +4,7 @@ from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer, HoodSerializer
+from .serializer import UserSerializer, HoodSerializer, ProfileSerializer
 from rest_framework import status
 from .models import User, Hood
 from django.contrib.auth import get_user_model, login
@@ -183,14 +183,17 @@ class ManageHood(APIView):
     #     return Response(serializers.data)
 
     def patch(self, request):
-        user = self.get_user(request)
-        print(user)
-        serializer = UserSerializer(user, request.data, partial=True) 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        if request.GET.get('user_id', None):
+            user = self.get_user(request)
+            print(user)
+            if user != None:
+                serializer = UserSerializer(user, request.data, partial=True) 
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OneHood(APIView):
@@ -235,7 +238,36 @@ class OneHood(APIView):
                 
             
             return Response({'status':'failed'}, status =status.HTTP_400_BAD_REQUEST)
-       
+
+class EditProfile(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_user(self, request):
+        
+        try:
+            user_id = request.GET.get('user_id')
+                
+            return User.objects.filter(id = user_id).first()
+        except User.DoesNotExist:
+            raise Http404()
+    
+    def patch(self, request):
+        if request.GET.get('user_id', None):
+            user = self.get_user(request)
+            print(user)
+            
+            if user != None:
+                serial2 = UserSerializer(user)
+                user_data = serial2.data
+                serializer = ProfileSerializer(user, request.data, partial=True) 
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(user_data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+           
 
 def activate_account(request, uid, token):
     User = get_user_model()

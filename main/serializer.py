@@ -30,3 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['profile_pic', 'bio', 'local_area', 'city_town', 'country', 'hood']
