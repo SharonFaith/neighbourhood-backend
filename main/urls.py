@@ -19,5 +19,6 @@ urlpatterns = [
     path('api/v1/profile/', views.EditProfile.as_view(), name='edit profile'),
     path('api/v1/manage_hood/', views.ManageHood.as_view(), name='appoint_hood_admin'),
     #path('api/v1/edit_hood/', views.OneHood.as_view(), name='edit-hood')
+    path('api/v1/join/', views.JoinHood.as_view(), name='join_hood')
 ]
 

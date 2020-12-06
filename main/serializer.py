@@ -34,3 +34,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['profile_pic', 'bio', 'local_area', 'city_town', 'country', 'hood']
+
+
+class JoinHoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['hood']

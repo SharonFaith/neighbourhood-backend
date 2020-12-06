@@ -4,7 +4,7 @@ from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer, HoodSerializer, ProfileSerializer
+from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer
 from rest_framework import status
 from .models import User, Hood
 from django.contrib.auth import get_user_model, login
@@ -257,11 +257,42 @@ class EditProfile(APIView):
             print(user)
             
             if user != None:
-                serial2 = UserSerializer(user)
-                user_data = serial2.data
+                
                 serializer = ProfileSerializer(user, request.data, partial=True) 
                 if serializer.is_valid():
                     serializer.save()
+                    serial2 = UserSerializer(user)
+                    user_data = serial2.data
+                    return Response(user_data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JoinHood(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get_user(self, request):
+        
+        try:
+            user_id = request.GET.get('user_id')
+                
+            return User.objects.filter(id = user_id).first()
+        except User.DoesNotExist:
+            raise Http404()
+    
+    def patch(self, request):
+        if request.GET.get('user_id', None):
+            user = self.get_user(request)
+            print(user)
+            
+            if user != None:
+               
+                serializer = JoinHoodSerializer(user, request.data, partial=True) 
+                if serializer.is_valid():
+                    serializer.save()
+                    serial2 = UserSerializer(user)
+                    user_data = serial2.data
                     return Response(user_data, status=status.HTTP_201_CREATED)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
