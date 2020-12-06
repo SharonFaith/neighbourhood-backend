@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .permissions import IsSuperuser, IsActivatedOrReadOnly
+from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -80,7 +80,7 @@ class HoodList(APIView):
     permission_classes = (IsActivatedOrReadOnly,)
 
     def get(self, request):
-        if request.GET.get('hood_id'):
+        if request.GET.get('hood_id', None):
             hood_id = request.GET.get('hood_id')
             hood = Hood.objects.filter(id = hood_id).first()
             users = hood.users.all()
@@ -181,7 +181,7 @@ class ManageHood(APIView):
 
 
 class OneHood(APIView):
-    permission_classes = (IsActivatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_hood(self, request):
 
@@ -191,19 +191,41 @@ class OneHood(APIView):
         # except Hood.DoesNotExist:
         #     raise Http404()
         try:
-            hood_id = request.GET.get('hood_id')
+            hood_id = request.GET.get('hood_id', None)
                 
             return Hood.objects.filter(id = hood_id).first()
-        except User.DoesNotExist:
+        except Hood.DoesNotExist:
             raise Http404()
 
     def get(self, request):
         
         hood = self.get_hood(request)
+        print(hood.id)
 
-        serializers = HoodSerializer(hood)
-        return Response(serializers.data)
+        
+        
+        user_id = request.GET.get('user_id')
+        user = User.objects.filter(id = user_id).first()
+        serializer = HoodSerializer(data=hood)
 
+
+        print(user.hood.id)
+        if serializer.is_valid():
+            if user != None:
+                if user.hood == None:
+                    return Response({'detail':'unauthorized'}, status =status.HTTP_400_BAD_REQUEST)
+                elif user.hood == hood.id:
+                    
+                        
+
+                    
+                    return Response(serializer.data)
+                else: 
+                    return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+                
+            
+            return Response({'status':'failed'}, status =status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status =status.HTTP_400_BAD_REQUEST)
 
 def activate_account(request, uid, token):
     User = get_user_model()

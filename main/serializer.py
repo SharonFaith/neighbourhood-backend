@@ -4,8 +4,18 @@ from .models import Hood
 
 User = get_user_model()
 
+
+
+class HoodSerializer(serializers.ModelSerializer):
+    #users = serializers.StringRelatedField()
+    class Meta:
+        model = Hood
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    hood_details = HoodSerializer(source='hood', read_only=True)
 
     class Meta:
         model = User
@@ -20,8 +30,3 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-
-class HoodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Hood
-        fields = '__all__'
