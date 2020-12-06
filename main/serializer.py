@@ -1,10 +1,34 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Hood, Post
+from .models import Hood, Post, Service, Comment, Category
 
 User = get_user_model()
 
 
+class ServiceSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Service
+        fields= '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Category
+        fields= '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Comment
+        fields= '__all__'
+
+
+class PostSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Post
+        fields= '__all__'
 
 class HoodSerializer(serializers.ModelSerializer):
     #users = serializers.StringRelatedField()
@@ -41,11 +65,6 @@ class JoinHoodSerializer(serializers.ModelSerializer):
         model = User
         fields = ['hood']
 
-class PostSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Post
-        fields= '__all__'
 
 class ManageHoodSerializer(serializers.ModelSerializer):
 

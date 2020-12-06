@@ -42,4 +42,3 @@ class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff
 
-#if user id in request returh that particular hood that corresponds to their hoodo
