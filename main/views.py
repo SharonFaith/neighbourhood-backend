@@ -202,36 +202,30 @@ class OneHood(APIView):
 
     def get(self, request):
         
-        hood = self.get_hood(request)
-        print(hood.id)
+            hood = self.get_hood(request)
+            print(hood.id)
 
-        
-        
-        user_id = request.GET.get('user_id')
-        user = User.objects.filter(id = user_id).first()
-        serializer = UserSerializer(user)
-        user = serializer.data
-        print(user)
-       
-        
-        
-
-        #print(user.hood.id)
-        if serializer.is_valid():
+            
+            
+            user_id = request.GET.get('user_id')
+            user = User.objects.filter(id = user_id).first()
+            print(user)
+            serializer = UserSerializer(user)
+            
             if user != None:
                 if user.hood == None:
                     return Response({'detail':'unauthorized'}, status =status.HTTP_400_BAD_REQUEST)
                 elif user.hood.id == hood.id:
-                    
+                    user = serializer.data
 
                     
-                    return Response(user.hood_details)
+                    return Response(user['hood_details'])
                 else: 
-                    return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({'status':'failed'}, status=status.HTTP_401_UNAUTHORIZED)
                 
             
             return Response({'status':'failed'}, status =status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status =status.HTTP_400_BAD_REQUEST)
+       
 
 def activate_account(request, uid, token):
     User = get_user_model()
