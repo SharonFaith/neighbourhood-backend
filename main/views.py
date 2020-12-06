@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
+from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsInHoodorSuperuser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -318,6 +318,40 @@ class PostList(APIView):
         serializers = PostSerializer(posts, many=True)
         return Response(serializers.data)
 
+class HoodPosts(APIView):
+    permission_classes = (IsInHoodorSuperuser,)
+
+    def get(self, request):
+
+        hood_id = request.GET.get('hood_id', None)
+        the_hood = Hood.objects.filter(id = hood_id).first()  
+
+        posts = Post.objects.filter(hood = the_hood).all()
+        serializers = PostSerializer(posts, many=True)
+        return Response(serializers.data)
+
+    def post(self, request):
+        hood_id = request.GET.get('hood_id', None)
+        the_hood = Hood.objects.filter(id = hood_id).first()  
+        info = request.data
+
+        print(info)
+        if info != None:
+            hood = info.get('hood')
+            user = info.get('user')
+            user_id = request.GET.get('user_id', None)
+            #user = User.objects.filter(id = user_id).first()
+                    
+            if hood == hood_id and user == user_id:
+            
+                serializer = PostSerializer(data=request.data)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
+        return Response({'status':'no data'}, status =status.HTTP_400_BAD_REQUEST)
 
 class AddPost(APIView):
     permission_classes = (IsActivatedOrReadOnly,)
@@ -327,8 +361,7 @@ class AddPost(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#add delete post if the user id in the request is the same as the user id in the post. same for comments.
-# services and categories - neighbourhood admin(+superuser) has crud functionality, other users have read only according to their neighbourhood
+
 class ListServices(APIView):
     permission_classes = (AllowAny,)
 

@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/v1/all_categories/', views.ListCategories.as_view(), name='all_categories'),
     path('api/v1/all_services/', views.ListServices.as_view(), name='all_services'),
     path('api/v1/join/', views.JoinHood.as_view(), name='join_hood'),
-    path('api/v1/post/', views.AddPost.as_view(), name='add_post')
+    #path('api/v1/post/', views.AddPost.as_view(), name='add_post'),
+    path('api/v1/hood_posts/', views.HoodPosts.as_view(), name='hood_posts')
 ]
 
