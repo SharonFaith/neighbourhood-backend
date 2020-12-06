@@ -34,6 +34,7 @@ class UserSignUp(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
+        print(request.data)
         serializers = UserSerializer(data=request.data)
         if serializers.is_valid():
             user = serializers.save()
@@ -45,8 +46,8 @@ class UserLogin(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        print(json.loads(request.body))
-        data = json.loads(request.body)
+        #print(json.loads(request.body))
+        data = request.data
         username = data.get('username')
         password = data.get('password')
         user = User.objects.filter(username = username).first()
