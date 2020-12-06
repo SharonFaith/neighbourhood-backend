@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer, PostSerializer, ManageHoodSerializer
+from .serializer import ServiceSerializer, CategorySerializer, CommentSerializer
 from rest_framework import status
 from .models import User, Hood, Post
 from django.contrib.auth import get_user_model, login

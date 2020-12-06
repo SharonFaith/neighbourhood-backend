@@ -25,13 +25,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    
+    comments = CommentSerializer(many=True, read_only=True, allow_null=True)
     class Meta:
         model = Post
         fields= '__all__'
 
 class HoodSerializer(serializers.ModelSerializer):
     #users = serializers.StringRelatedField()
+    hood_services = ServiceSerializer(many=True, read_only=True, allow_null=True)
+    hood_posts= PostSerializer(many=True, read_only=True, allow_null=True)
     class Meta:
         model = Hood
         fields = '__all__'
