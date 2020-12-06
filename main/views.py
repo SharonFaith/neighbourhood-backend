@@ -4,7 +4,7 @@ from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer, PostSerializer
+from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer, PostSerializer, ManageHoodSerializer
 from rest_framework import status
 from .models import User, Hood, Post
 from django.contrib.auth import get_user_model, login
@@ -187,10 +187,12 @@ class ManageHood(APIView):
             user = self.get_user(request)
             print(user)
             if user != None:
-                serializer = UserSerializer(user, request.data, partial=True) 
+                serializer = ManageHoodSerializer(user, request.data, partial=True) 
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    serial2 = UserSerializer(user)
+                    user_data = serial2.data
+                    return Response(user_data, status=status.HTTP_201_CREATED)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
