@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Hood
+from .models import Hood, Post
 
 User = get_user_model()
 
@@ -33,10 +33,16 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['profile_pic', 'bio', 'local_area', 'city_town', 'country', 'hood']
+        fields = ['username','profile_pic', 'bio', 'local_area', 'city_town', 'country', 'hood']
 
 
 class JoinHoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['hood']
+
+class PostSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Post
+        fields= '__all__'

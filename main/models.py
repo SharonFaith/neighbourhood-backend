@@ -93,6 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     hood = models.ForeignKey(Hood,on_delete=models.CASCADE)
+    content = models.TextField(max_length=400, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
 
 class Category(models.Model):

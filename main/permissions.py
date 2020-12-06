@@ -12,6 +12,7 @@ class IsActivatedOrReadOnly(BasePermission):
         else:
             return request.user.is_active
 
+
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:

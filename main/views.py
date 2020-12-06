@@ -4,9 +4,9 @@ from .permissions import IsSuperuser, IsActivatedOrReadOnly, IsHoodUser
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer
+from .serializer import UserSerializer, HoodSerializer, ProfileSerializer, JoinHoodSerializer, PostSerializer
 from rest_framework import status
-from .models import User, Hood
+from .models import User, Hood, Post
 from django.contrib.auth import get_user_model, login
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
@@ -80,7 +80,7 @@ class SingleUser(APIView):
 
 
 class HoodList(APIView):
-    permission_classes = (IsActivatedOrReadOnly,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         
@@ -299,6 +299,29 @@ class JoinHood(APIView):
         return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
            
+class PostList(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        
+        posts = Post.objects.all()
+        serializers = PostSerializer(posts, many=True)
+        return Response(serializers.data)
+
+
+class AddPost(APIView):
+    permission_classes = (IsActivatedOrReadOnly,)
+    def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 
 def activate_account(request, uid, token):
     User = get_user_model()
@@ -317,3 +340,4 @@ def activate_account(request, uid, token):
 
     else:
         return HttpResponse('nothing found')
+
