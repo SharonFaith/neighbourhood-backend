@@ -77,7 +77,8 @@ class SingleUser(APIView):
             if user is not None:
                 serializer = UserSerializer(user)
                 return Response(serializer.data)
-        return Response(data={'status':'failed'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={'detail':'no user id'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class HoodList(APIView):
@@ -452,7 +453,7 @@ class ManageService(APIView):
             
                 #print(hood)
                 if the_hood != None:
-                    if user.hood.id == hood_id:
+                    if user.hood.id == the_hood.id:
                         serializer = ServiceSerializer(data=request.data)
                     
                         if serializer.is_valid():
@@ -502,7 +503,7 @@ class ManageService(APIView):
                     if user.hood:
                         print(user.hood.id)
                         print(hood_id)
-                        if user.hood.id == hood_id:
+                        if user.hood.id == the_hood.id:
                             serializers = ServiceSerializer(hood_services, many=True)
                             #print(serializers.data)
                             return Response(serializers.data)
@@ -543,14 +544,16 @@ class ManageService(APIView):
                 #print(hood)
                 if the_hood != None:
                     if user.hood:
-                        if user.hood.id == hood_id:
-                            serializer = ServiceSerializer(service, data=request.data)
+                        if user.hood.id == the_hood.id:
+                            if service:
+                                serializer = ServiceSerializer(service, data=request.data)
+                            
+                                if serializer.is_valid():
+                                    serializer.save()
+                                    return Response(serializer.data, status=status.HTTP_201_CREATED)
                         
-                            if serializer.is_valid():
-                                serializer.save()
-                                return Response(serializer.data, status=status.HTTP_201_CREATED)
-                    
-                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
                         else:
                             return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
                     return Response({'detail':'no hood '}, status=status.HTTP_400_BAD_REQUEST)                                          
@@ -586,7 +589,7 @@ class ManageService(APIView):
                 #print(hood)
                 if the_hood != None:
                     if user.hood:
-                        if user.hood.id == hood_id:
+                        if user.hood.id == the_hood.id:
                             if service:
                                 
                                 service.delete()
@@ -619,7 +622,7 @@ class ManageService(APIView):
                 #print(hood)
                 if the_hood != None:
                     if user.hood:
-                        if user.hood.id == hood_id:
+                        if user.hood.id == the_hood.id:
                             if service:
                                 serializer = ServiceSerializer(service, request.data, partial=True) 
                                 if serializer.is_valid():
@@ -712,7 +715,7 @@ class ManageUser(APIView):
                 serializer = UserSerializer(user)
                 return Response(serializer.data)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(data={'status':'failed'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={'detail':'no user id'}, status=status.HTTP_400_BAD_REQUEST)
                     
            
        
