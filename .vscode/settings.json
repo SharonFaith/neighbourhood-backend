@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
+    "python.pythonPath": "env/bin/python",
+=======
     "python.pythonPath": "virtual/bin/python",
+>>>>>>> aac76ff4d836c04814c658733258c9cead1c4647
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }
