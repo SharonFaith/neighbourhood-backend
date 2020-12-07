@@ -20,6 +20,25 @@ class Hood(models.Model):
     def __str__(self):
         return self.name
 
+
+    def save_hood(self):
+        self.save()
+
+    def delete_hood(self):
+        self.delete()
+
+    @classmethod
+    def update_hood(cls, id, update):
+        cls.objects.filter(id = id).update(name = update)
+        
+        #to_update
+
+    @classmethod
+    def get_hood_by_id(cls, id):
+        hood = cls.objects.filter(id = id)
+        
+        return hood
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, first_name, last_name, password, **other_fields):
         if not email:
@@ -96,8 +115,46 @@ class Post(models.Model):
     content = models.TextField(max_length=400, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
 
+    def save_post(self):
+        self.save()
+
+    def delete_post(self):
+        self.delete()
+
+    @classmethod
+    def update_post(cls, id, update):
+        cls.objects.filter(id = id).update(content = update)
+        
+        #to_update
+
+    @classmethod
+    def get_post_by_id(cls, id):
+        post = cls.objects.filter(id = id)
+        
+        return post
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255)
+
+
+    def save_category(self):
+        self.save()
+
+    def delete_category(self):
+        self.delete()
+
+    @classmethod
+    def update_category(cls, id, update):
+        cls.objects.filter(id = id).update(name = update)
+        
+        #to_update
+
+    @classmethod
+    def get_categ_by_id(cls, id):
+        category = cls.objects.filter(id = id)
+        
+        return category
 
 # class A_Category(models.Model):
 #     name = models.CharField(max_length=255)
@@ -110,13 +167,47 @@ class Service(models.Model):
     email = models.EmailField(max_length=255)
     description = models.TextField(null=True)
 
+    def save_service(self):
+        self.save()
+
+    def delete_service(self):
+        self.delete()
+
+    @classmethod
+    def update_service(cls, id, update):
+        cls.objects.filter(id = id).update(name = update)
+        
+        #to_update
+
+    @classmethod
+    def get_service_by_id(cls, id):
+        service = cls.objects.filter(id = id)
+        
+        return service
+
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     posted_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField(null=True)
 
+    def save_comment(self):
+        self.save()
 
+    def delete_comment(self):
+        self.delete()
+
+    @classmethod
+    def update_comment(cls, id, update):
+        cls.objects.filter(id = id).update(content = update)
+        
+        #to_update
+
+    @classmethod
+    def get_comment_by_id(cls, id):
+        comment = cls.objects.filter(id = id)
+        
+        return comment
 
 
 
