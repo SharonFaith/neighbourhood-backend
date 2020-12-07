@@ -294,17 +294,22 @@ class JoinHood(APIView):
     def patch(self, request):
         if request.GET.get('user_id', None):
             user = self.get_user(request)
-            print(user)
+            user_id = request.GET.get('user_id')
+           
             
             if user != None:
-               
-                serializer = JoinHoodSerializer(user, request.data, partial=True) 
-                if serializer.is_valid():
-                    serializer.save()
-                    serial2 = UserSerializer(user)
-                    user_data = serial2.data
-                    return Response(user_data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                #if user_id == id_user:
+                    serializer = JoinHoodSerializer(user, request.data, partial=True) 
+                    
+                    if serializer.is_valid():
+                        print(serializer.validated_data)
+                    
+                        serializer.save()
+                        serial2 = UserSerializer(user)
+                        user_data = serial2.data
+                        return Response(user_data, status=status.HTTP_201_CREATED)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                #return Response({'detail':'unauthorized to access to other users'}, status =status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -657,7 +662,7 @@ class ManageCategs(APIView):
         return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ManageUser(APIView):
-    permission_classes = (IsSuperuser)
+    permission_classes = (IsSuperuser,)
 
     def post(self, request, format=None):
        

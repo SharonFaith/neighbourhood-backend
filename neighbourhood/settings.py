@@ -18,6 +18,7 @@ from decouple import config, Csv
 from os.path import dirname, abspath
 import django
 import cloudinary
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 #BASE_DIR = Path(__file__).resolve().parent.parent
 #BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -201,7 +202,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SENDGRID_API_KEY=config('SENDGRID_API_KEY')
 SENDGRID_EMAIL_ADDRESS = config('SENDGRID_EMAIL_ADDRESS')
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60)
+}
+
+
 django_heroku.settings(locals())
+
 
 LOGGING = {
     'version': 1,
