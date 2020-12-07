@@ -1,6 +1,6 @@
 # NEIGHBOURHOOD 
 #### Live-Link
-https://neighbourhood-back.herokuapp.com/api/users/
+https://neighbourhood-back.herokuapp.com/
 ### Description:
 This a Neighbourhood Web Application that provides a platform for residents of various neighbourhoods to interact with each other, and keep abreast of current activities in their neighbourhoods.
 #### BDD As a User:
