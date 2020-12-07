@@ -42,7 +42,7 @@ class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff
 
-class IsInHoodorSuperuser(BasePermission):
+class IsInHood(BasePermission):
     def has_permission(self, request, view): 
         if request.GET.get('user_id', None):
             if request.GET.get('hood_id', None):
@@ -66,3 +66,4 @@ class IsInHoodorSuperuser(BasePermission):
                 return False
             return False        
         return False
+
