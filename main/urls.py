@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from . import views
 from .views import welcome
 
-
+ 
 urlpatterns = [
     path('', welcome, name='welcome'),
     path('api/users/', views.UserList.as_view()),
@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/auth/signup/', views.UserSignUp.as_view(), name='signup' ),
     path('api/auth/login/', views.UserLogin.as_view(), name='login'),
     path('api/v1/hoods/', views.HoodList.as_view(), name='hoods'),
-    path('api/v1/user/', views.SingleUser.as_view(), name='single_user')
+    path('api/v1/user/', views.SingleUser.as_view(), name='single_user') 
 
 ]
+  

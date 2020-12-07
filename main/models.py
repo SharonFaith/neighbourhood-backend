@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.contrib.auth.hashers import make_password
 
 
-
+ 
 
 class Hood(models.Model):
     name = models.CharField(max_length=255, unique=True)
