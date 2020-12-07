@@ -361,6 +361,10 @@ class PostList(APIView):
 class HoodPosts(APIView):
     permission_classes = (IsInHood,)
 
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user (should be in that hood)',type=openapi.TYPE_INTEGER)
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description='id of the hood',type=openapi.TYPE_INTEGER)
+
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def get(self, request):
 
         hood_id = request.GET.get('hood_id', None)
@@ -370,6 +374,7 @@ class HoodPosts(APIView):
         serializers = PostSerializer(posts, many=True)
         return Response(serializers.data)
 
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def post(self, request):
         hood_id = request.GET.get('hood_id', None)
         the_hood = Hood.objects.filter(id = hood_id).first()  
@@ -398,6 +403,9 @@ class HoodPosts(APIView):
             return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
         return Response({'status':'no data'}, status =status.HTTP_400_BAD_REQUEST)
 
+    post_param_config = openapi.Parameter('post_id', in_=openapi.IN_QUERY, description='id of the hood post to delete',type=openapi.TYPE_INTEGER)
+    
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config, post_param_config])
     def delete(self, request):
         if request.GET.get('user_id', None):
             user_id = request.GET.get('user_id')
@@ -415,6 +423,11 @@ class HoodPosts(APIView):
 
 class AddComments(APIView):
     permission_classes = (IsInHood,)
+
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user (should be in that hood)',type=openapi.TYPE_INTEGER)
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description='id of the hood in which the post being commented on is in',type=openapi.TYPE_INTEGER)
+
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def post(self, request):
         hood_id = request.GET.get('hood_id', None)
         the_hood = Hood.objects.filter(id = hood_id).first()  
@@ -476,6 +489,13 @@ class ListServices(APIView):
 class ManageService(APIView):
     permission_classes = (IsAdmin,)
 
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user making the requests',type=openapi.TYPE_INTEGER)    
+    service_param_config = openapi.Parameter('service_id', in_=openapi.IN_QUERY, description='id of the particular service',type=openapi.TYPE_INTEGER)
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description='hood id. Only pass param if user is a hood admin. The superuser does not take this param',type=openapi.TYPE_INTEGER)
+    
+
+
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def post(self, request):
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
@@ -519,13 +539,14 @@ class ManageService(APIView):
             return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
         return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def get(self, request):
         user_id = request.GET.get('user_id')
                 
         user = User.objects.filter(id = user_id).first()
         print(user)
         print(user.is_staff)
-        all_services = Service.objects.filter()
+        all_services = Service.objects.all()
         if user:
             if request.GET.get('hood_id', None):
                 hood_id = request.GET.get('hood_id')
@@ -563,7 +584,7 @@ class ManageService(APIView):
                 return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
         return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)                
            
-       
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config, service_param_config])   
     def put(self, request):
         service_id  = request.GET.get('service_id')
         service  = Service.objects.filter(id = service_id).first()
@@ -608,7 +629,7 @@ class ManageService(APIView):
             return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
         return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config, service_param_config])   
     def delete(self, request):
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
@@ -642,6 +663,7 @@ class ManageService(APIView):
             return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
         return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config, service_param_config])   
     def patch(self, request):
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
@@ -684,6 +706,10 @@ class HoodServices(APIView):
 
     permission_classes = (IsInHood,)
 
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user (should be in that hood)',type=openapi.TYPE_INTEGER)
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description='id of the hood',type=openapi.TYPE_INTEGER)
+
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def get(self, request):
 
         hood_id = request.GET.get('hood_id', None)
@@ -704,6 +730,10 @@ class ManageCategs(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    categ_param_config = openapi.Parameter('categ_id', in_=openapi.IN_QUERY, description='id of the category',type=openapi.TYPE_INTEGER)
+    
+
+    @swagger_auto_schema(manual_parameters=[categ_param_config])
     def get(self, request):
         if request.GET.get('categ_id', None):
             categ_id = request.GET.get('categ_id')
@@ -716,7 +746,8 @@ class ManageCategs(APIView):
             return Response({'detail':'no categ with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no categ id provided'}, status=status.HTTP_400_BAD_REQUEST)
                     
-
+    
+    @swagger_auto_schema(manual_parameters=[categ_param_config])
     def delete(self, request):
         if request.GET.get('categ_id', None):
             categ_id = request.GET.get('categ_id')
@@ -740,6 +771,11 @@ class ManageUser(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user to be accessed',type=openapi.TYPE_INTEGER)
+    
+
+    @swagger_auto_schema(manual_parameters=[user_param_config])
     def get(self, request):
         if request.GET.get('user_id', None):
             user_id = request.GET.get('user_id')
@@ -752,7 +788,7 @@ class ManageUser(APIView):
         return Response(data={'detail':'no user id'}, status=status.HTTP_400_BAD_REQUEST)
                     
            
-       
+    @swagger_auto_schema(manual_parameters=[user_param_config])   
     def put(self, request):
         if request.GET.get('user_id', None):
             user_id = request.GET.get('user_id')
