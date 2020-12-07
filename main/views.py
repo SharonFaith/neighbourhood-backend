@@ -16,13 +16,8 @@ from .email.activation_email import send_activation_email
 import requests
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
-<<<<<<< HEAD
-
- 
-=======
 import json
 
->>>>>>> aac76ff4d836c04814c658733258c9cead1c4647
 
 def get_tokens(user):
     refresh = RefreshToken.for_user(user)

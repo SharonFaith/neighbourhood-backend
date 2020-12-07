@@ -41,9 +41,6 @@ class IsSuperuser(BasePermission):
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff
-<<<<<<< HEAD
-         
-=======
 
 class IsInHood(BasePermission):
     def has_permission(self, request, view): 
@@ -70,4 +67,3 @@ class IsInHood(BasePermission):
             return False        
         return False
 
->>>>>>> aac76ff4d836c04814c658733258c9cead1c4647

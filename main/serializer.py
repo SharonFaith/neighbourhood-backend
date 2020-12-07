@@ -42,12 +42,8 @@ class HoodSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-<<<<<<< HEAD
- 
-=======
     hood_details = HoodSerializer(source='hood', read_only=True)
 
->>>>>>> aac76ff4d836c04814c658733258c9cead1c4647
     class Meta:
         model = User
         exclude = ['date_registered', 'groups', 'user_permissions']

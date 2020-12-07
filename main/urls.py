@@ -12,12 +12,6 @@ urlpatterns = [
     path('api/auth/signup/', views.UserSignUp.as_view(), name='signup' ),
     path('api/auth/login/', views.UserLogin.as_view(), name='login'),
     path('api/v1/hoods/', views.HoodList.as_view(), name='hoods'),
-<<<<<<< HEAD
-    path('api/v1/user/', views.SingleUser.as_view(), name='single_user') 
-
-]
-  
-=======
     path('api/v1/user/', views.SingleUser.as_view(), name='single_user'),
     path('api/v1/view_hood/', views.OneHood.as_view(), name='one_hood'),
     path('api/v1/create_hood/', views.CreateHood.as_view(), name='create_hood'),
@@ -40,4 +34,3 @@ urlpatterns = [
 
 ]
 
->>>>>>> aac76ff4d836c04814c658733258c9cead1c4647
