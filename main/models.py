@@ -41,6 +41,14 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
     def create_superuser(self, email, username, first_name, last_name, password, **other_fields):
+
+        if not username:
+            raise ValueError('Username is required')
+        if not first_name:
+            raise ValueError('You must provide your first_name')
+        if not last_name:
+            raise ValueError('You must provide your last_name')
+        
         other_fields.setdefault('is_staff', True)
         other_fields.setdefault('is_superuser', True)
         other_fields.setdefault('is_active', True)
@@ -77,30 +85,34 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    # REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return self.username
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    hood = models.ForeignKey(Hood,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    hood = models.ForeignKey(Hood,on_delete=models.CASCADE, related_name='hood_posts')
+    content = models.TextField(max_length=400, blank=True)
     posted_at = models.DateTimeField(auto_now_add=True)
 
 class Category(models.Model):
-    category_name = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+
+# class A_Category(models.Model):
+#     name = models.CharField(max_length=255)
 
 class Service(models.Model):
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    hood = models.ForeignKey(Hood, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='services')
+    hood = models.ForeignKey(Hood, on_delete=models.CASCADE, related_name='hood_services')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services_owned')
     email = models.EmailField(max_length=255)
     description = models.TextField(null=True)
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     posted_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField(null=True)
 
