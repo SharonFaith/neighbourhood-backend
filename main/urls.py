@@ -4,12 +4,7 @@ from django.conf.urls.static import static
 from . import views
 from .views import welcome
 
-<<<<<<< HEAD
 
-
-=======
- 
->>>>>>> e4b2a9f1749404ec280b8c2a80fd21078d2d1c3e
 urlpatterns = [
    
     path('', welcome, name='welcome'),

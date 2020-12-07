@@ -84,6 +84,7 @@ SENDGRID_EMAIL_ADDRESS='<your sendgrid email_address>'
 Copyright (c) 2020 **Victor Maina,Sharon Olago,Jeffrey Mwai,Martin Mandina,
 
 [MIT License](./LICENSE)
+<<<<<<< HEAD
 
 
 
@@ -92,3 +93,5 @@ Copyright (c) 2020 **Victor Maina,Sharon Olago,Jeffrey Mwai,Martin Mandina,
   
 
 
+=======
+>>>>>>> 3ba96c5002929f9b28b0aa1251de0dd8acd9677e
