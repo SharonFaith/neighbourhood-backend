@@ -18,6 +18,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from django.conf import settings
+
 
 def get_tokens(user):
     refresh = RefreshToken.for_user(user)
@@ -34,6 +38,7 @@ def welcome(request):
 class UserSignUp(APIView):
     permission_classes = (AllowAny,)
 
+    
     def post(self, request, format=None):
         print(request.data)
         serializers = UserSerializer(data=request.data)
@@ -66,9 +71,13 @@ class UserList(APIView):
         serializers = UserSerializer(all_users, many=True)
         return Response(serializers.data)
 
+
 class SingleUser(APIView):
     permission_classes=(IsAuthenticated,)
 
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='user id to be returned',type=openapi.TYPE_INTEGER)
+
+    @swagger_auto_schema(manual_parameters=[user_param_config])
     def get(self, request):
         if request.GET.get('user_id', None):
             user_id = request.GET.get('user_id')
@@ -100,6 +109,11 @@ class CreateHood(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    
+    
+    
+
+    
     def get_hood(self, request):
 
         # try:
@@ -113,7 +127,10 @@ class CreateHood(APIView):
             return Hood.objects.filter(id = hood_id).first()
         except Hood.DoesNotExist:
             raise Http404()
+    
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description='id of the specific neighbourhood',type=openapi.TYPE_INTEGER)
 
+    @swagger_auto_schema(manual_parameters=[hood_param_config])
     def get(self, request):
         if request.GET.get('hood_id', None):
             hood_id = request.GET.get('hood_id')
@@ -127,7 +144,7 @@ class CreateHood(APIView):
         return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
                     
            
-       
+    @swagger_auto_schema(manual_parameters=[hood_param_config])   
     def put(self, request):
         if request.GET.get('hood_id', None):
             hood = self.get_hood(request)
@@ -141,6 +158,8 @@ class CreateHood(APIView):
                     return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @swagger_auto_schema(manual_parameters=[hood_param_config])   
     def delete(self, request):
         if request.GET.get('hood_id', None):
             hood = self.get_hood(request)
@@ -150,6 +169,7 @@ class CreateHood(APIView):
             return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
     
+    @swagger_auto_schema(manual_parameters=[hood_param_config])   
     def patch(self, request):
         if request.GET.get('hood_id', None):
             hood = self.get_hood(request)
@@ -183,7 +203,9 @@ class ManageHood(APIView):
 
     #     serializers = UserSerializer(user)
     #     return Response(serializers.data)
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user to be set as hood admin',type=openapi.TYPE_INTEGER)
 
+    @swagger_auto_schema(manual_parameters=[user_param_config])
     def patch(self, request):
         if request.GET.get('user_id', None):
             user = self.get_user(request)
@@ -217,6 +239,12 @@ class OneHood(APIView):
         except Hood.DoesNotExist:
             raise Http404()
 
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user',type=openapi.TYPE_INTEGER)
+
+    hood_param_config = openapi.Parameter('hood_id', in_=openapi.IN_QUERY, description="id of that user's hood",type=openapi.TYPE_INTEGER)
+
+    
+    @swagger_auto_schema(manual_parameters=[user_param_config, hood_param_config])
     def get(self, request):
         if request.GET.get('hood_id', None):
             
@@ -262,6 +290,9 @@ class EditProfile(APIView):
         except User.DoesNotExist:
             raise Http404()
     
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user editing their profile',type=openapi.TYPE_INTEGER)
+    
+    @swagger_auto_schema(manual_parameters=[user_param_config])    
     def patch(self, request):
         if request.GET.get('user_id', None):
             user = self.get_user(request)
@@ -292,6 +323,9 @@ class JoinHood(APIView):
         except User.DoesNotExist:
             raise Http404()
     
+    user_param_config = openapi.Parameter('user_id', in_=openapi.IN_QUERY, description='id of the user joining a hood',type=openapi.TYPE_INTEGER)
+
+    @swagger_auto_schema(manual_parameters=[user_param_config])    
     def patch(self, request):
         if request.GET.get('user_id', None):
             user = self.get_user(request)

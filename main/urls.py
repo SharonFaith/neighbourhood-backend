@@ -5,7 +5,9 @@ from . import views
 from .views import welcome
 
 
+
 urlpatterns = [
+   
     path('', welcome, name='welcome'),
     path('api/users/', views.UserList.as_view(),name='user-list'),
     path('activate-account/<uid>/<token>/', views.activate_account, name='activation_email'),
