@@ -27,9 +27,9 @@ urlpatterns = [
     #path('api/v1/post/', views.AddPost.as_view(), name='add_post'),
     path('api/v1/hood_posts/', views.HoodPosts.as_view(), name='hood_posts'),
     path('api/v1/hood_services/', views.HoodServices.as_view(), name='hood_services'),
-    path('api/v1/crud_categ/', views.ManageCategs.as_view(),name='edit_categ' ),
+    path('api/v1/manage_categ/', views.ManageCategs.as_view(),name='edit_categ' ),
     path('api/v1/add_comment/', views.AddComments.as_view(), name='add_comment'),
-    path('api/v1/crud-service/', views.ManageService.as_view(), name='service'),
+    path('api/v1/manage_service/', views.ManageService.as_view(), name='service'),
     path('api/v1/manage_user/', views.ManageUser.as_view(), name='service'),
 
 ]
