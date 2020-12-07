@@ -278,7 +278,7 @@ class EditProfile(APIView):
                     serializer.save()
                     serial2 = UserSerializer(user)
                     user_data = serial2.data
-                    return Response(user_data, status=status.HTTP_201_CREATED)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
@@ -299,17 +299,22 @@ class JoinHood(APIView):
     def patch(self, request):
         if request.GET.get('user_id', None):
             user = self.get_user(request)
-            print(user)
+            user_id = request.GET.get('user_id')
+           
             
             if user != None:
-               
-                serializer = JoinHoodSerializer(user, request.data, partial=True) 
-                if serializer.is_valid():
-                    serializer.save()
-                    serial2 = UserSerializer(user)
-                    user_data = serial2.data
-                    return Response(user_data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                #if user_id == id_user:
+                    serializer = JoinHoodSerializer(user, request.data, partial=True) 
+                    
+                    if serializer.is_valid():
+                        print(serializer.validated_data)
+                    
+                        serializer.save()
+                        serial2 = UserSerializer(user)
+                        user_data = serial2.data
+                        return Response(user_data, status=status.HTTP_201_CREATED)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                #return Response({'detail':'unauthorized to access to other users'}, status =status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'no user with that id'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'detail':'no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -341,20 +346,25 @@ class HoodPosts(APIView):
         info = request.data
 
         print(info)
-        if info != None:
-            hood = info.get('hood')
-            user = info.get('user')
+        if the_hood != None:
+            # hood = info.get('hood')
+            # user = info.get('user')
             user_id = request.GET.get('user_id', None)
-            #user = User.objects.filter(id = user_id).first()
-                    
-            if hood == hood_id and user == user_id:
+            user = User.objects.filter(id = user_id).first()
+            print(user)    
+            print(the_hood)   
+            if user != None:
+                if user.hood:
+                    if user.hood.id == the_hood.id:
             
-                serializer = PostSerializer(data=request.data)
-                
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        serializer = PostSerializer(data=request.data)
+                        
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'user not in hood'}, status =status.HTTP_400_BAD_REQUEST)
+                return Response({'detail':'user not in any hood'}, status =status.HTTP_400_BAD_REQUEST)
             return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
         return Response({'status':'no data'}, status =status.HTTP_400_BAD_REQUEST)
 
@@ -379,23 +389,29 @@ class AddComments(APIView):
         hood_id = request.GET.get('hood_id', None)
         the_hood = Hood.objects.filter(id = hood_id).first()  
         info = request.data
-
+        
+        
         print(info)
-        if info != None:
-            hood = info.get('hood')
-            user = info.get('user')
+        if the_hood != None:
+            # hood = info.get('hood')
+            # user = info.get('user')
             user_id = request.GET.get('user_id', None)
-            #user = User.objects.filter(id = user_id).first()
-                    
-            if hood == hood_id and user == user_id:
+            user = User.objects.filter(id = user_id).first()
+            print(user)    
+            print(the_hood)   
+            if user != None:
+                if user.hood:
+                    if user.hood.id == the_hood.id:
             
-                serializer = CommentSerializer(data=request.data)
-                
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
+                        serializer = CommentSerializer(data=request.data)
+                        
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'unauthorized hood or user indicated'}, status =status.HTTP_400_BAD_REQUEST)
+                return Response({'detail':'user has no hood'}, status =status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no user with that id'}, status =status.HTTP_400_BAD_REQUEST)
         return Response({'status':'no data'}, status =status.HTTP_400_BAD_REQUEST)
        
 
@@ -433,80 +449,89 @@ class ManageService(APIView):
     def post(self, request):
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            the_hood = Hood.objects.filter(id = hood_id).first()
-           
-            #print(hood)
-            if hood != None:
-                if user.hood.id == hood_id:
-                    serializer = ServiceSerializer(data=request.data)
-                
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        if user:
+            if request.GET.get('hood_id', None):
+                hood_id = request.GET.get('hood_id')
+                the_hood = Hood.objects.filter(id = hood_id).first()
             
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-                elif user.is_superuser:
-                    serializer = ServiceSerializer(data=request.data)
+                #print(hood)
+                if the_hood != None:
+                    if user.hood.id == hood_id:
+                        serializer = ServiceSerializer(data=request.data)
+                    
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
                 
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    elif user.is_superuser:
+                        serializer = ServiceSerializer(data=request.data)
+                    
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    
                 else:
-                    return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+            elif user.is_superuser:
+                serializer = ServiceSerializer(data=request.data)
+                    
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
                 
-            else:
-                return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        elif user.is_superuser:
-            serializer = ServiceSerializer(data=request.data)
-                
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
-
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
+            return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user_id = request.GET.get('user_id')
                 
         user = User.objects.filter(id = user_id).first()
-        
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            the_hood = Hood.objects.filter(id = hood_id).first()
-          
-            hood_services = Service.objects.filter(hood = the_hood).all()
-            all_services = Service.objects.filter()
-            #print(hood)
-            if hood != None:
-                if user.hood.id == hood_id:
-                    serializers = ServiceSerializer(hood_services, many=True)
-                    #print(serializers.data)
-                    return Response(serializers.data)
+        print(user)
+        print(user.is_staff)
+        all_services = Service.objects.filter()
+        if user:
+            if request.GET.get('hood_id', None):
+                hood_id = request.GET.get('hood_id')
+                the_hood = Hood.objects.filter(id = hood_id).first()
+                hood_services = Service.objects.filter(hood = the_hood).all()
+               
+                #print(hood)
+                if the_hood != None:
+                    if user.hood:
+                        print(user.hood.id)
+                        print(hood_id)
+                        if user.hood.id == hood_id:
+                            serializers = ServiceSerializer(hood_services, many=True)
+                            #print(serializers.data)
+                            return Response(serializers.data)
+                        elif user.is_superuser:
+                            serializers = ServiceSerializer(all_services, many=True)
+                            return Response(serializers.data)
+                        else:
+                            print('?')
+                            return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood '}, status=status.HTTP_400_BAD_REQUEST)                                          
                 elif user.is_superuser:
                     serializers = ServiceSerializer(all_services, many=True)
                     return Response(serializers.data)
+                    
                 else:
-                    return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
+            
             elif user.is_superuser:
                 serializers = ServiceSerializer(all_services, many=True)
                 return Response(serializers.data)
-                
-            else:
-                return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        elif user.is_superuser:
-            serializers = ServiceSerializer(all_services, many=True)
-            return Response(serializers.data)
 
-        else:
-            return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
-                    
+            else:
+                return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)                
            
        
     def put(self, request):
@@ -514,39 +539,42 @@ class ManageService(APIView):
         service  = Service.objects.filter(id = service_id).first()
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            the_hood = Hood.objects.filter(id = hood_id).first()
-            
-            
-            #print(hood)
-            if hood != None:
-                if user.hood.id == hood_id:
-                    serializer = ServiceSerializer(service, data=request.data)
+        if user:
+            if request.GET.get('hood_id', None):
+                hood_id = request.GET.get('hood_id')
+                the_hood = Hood.objects.filter(id = hood_id).first()
                 
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
-            
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+                #print(hood)
+                if the_hood != None:
+                    if user.hood:
+                        if user.hood.id == hood_id:
+                            serializer = ServiceSerializer(service, data=request.data)
+                        
+                            if serializer.is_valid():
+                                serializer.save()
+                                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        else:
+                            return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood '}, status=status.HTTP_400_BAD_REQUEST)                                          
+                    
                 else:
-                    return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
+            elif user.is_superuser:
+                if service:
+                        serializer = ServiceSerializer(service, data=request.data)
+                    
+                        if serializer.is_valid():
+                            serializer.save()
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
                 
-            else:
-                return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
-        elif user.is_superuser:
-            if service:
-                    serializer = ServiceSerializer(service, data=request.data)
-                
-                    if serializer.is_valid():
-                        serializer.save()
-                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
             
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def delete(self, request):
@@ -555,63 +583,70 @@ class ManageService(APIView):
             
         service_id  = request.GET.get('service_id')
         service  = Service.objects.filter(id = service_id).first()
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            the_hood = Hood.objects.filter(id = hood_id).first()
-            
-            #print(hood)
-            if hood != None:
-                if user.hood.id == hood_id:
-                    if service:
-                        
-                        service.delete()
-                        return Response(status=status.HTTP_204_NO_CONTENT)
-                    return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
-               
-                return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)                            
-            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
-        elif user.is_superuser:
-            if service:
-                        
-                service.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
-
+        if user:
+            if request.GET.get('hood_id', None):
+                hood_id = request.GET.get('hood_id')
+                the_hood = Hood.objects.filter(id = hood_id).first()
+                
+                #print(hood)
+                if the_hood != None:
+                    if user.hood:
+                        if user.hood.id == hood_id:
+                            if service:
+                                
+                                service.delete()
+                                return Response(status=status.HTTP_204_NO_CONTENT)
+                            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                        return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood '}, status=status.HTTP_400_BAD_REQUEST)                                                                      
+                return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
+            elif user.is_superuser:
+                if service:
+                            
+                    service.delete()
+                    return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request):
         user_id = request.GET.get('user_id')                
         user = User.objects.filter(id = user_id).first()
         service_id  = request.GET.get('service_id')
         service  = Service.objects.filter(id = service_id).first()
-        if request.GET.get('hood_id', None):
-            hood_id = request.GET.get('hood_id')
-            the_hood = Hood.objects.filter(id = hood_id).first()
-            
-            
-            #print(hood)
-            if hood != None:
-                if user.hood.id == hood_id:
-                    if service:
+        if user:
+            if request.GET.get('hood_id', None):
+                hood_id = request.GET.get('hood_id')
+                the_hood = Hood.objects.filter(id = hood_id).first()
+                
+                
+                #print(hood)
+                if the_hood != None:
+                    if user.hood:
+                        if user.hood.id == hood_id:
+                            if service:
+                                serializer = ServiceSerializer(service, request.data, partial=True) 
+                                if serializer.is_valid():
+                                    serializer.save()
+                                    return Response(serializer.data)
+                                return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+                            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
+                    
+                        return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'detail':'no hood '}, status=status.HTTP_400_BAD_REQUEST)                                          
+                return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
+            elif user.is_superuser:
+                if service:
                         serializer = ServiceSerializer(service, request.data, partial=True) 
                         if serializer.is_valid():
-                            serializer.save()
-                            return Response(serializer.data)
+                                serializer.save()
+                                return Response(serializer.data)
                         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-                    return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
-               
-                return Response({'detail': 'user not authorized'}, status=status.HTTP_400_BAD_REQUEST)                            
-            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)              
-        elif user.is_superuser:
-            if service:
-                    serializer = ServiceSerializer(service, request.data, partial=True) 
-                    if serializer.is_valid():
-                            serializer.save()
-                            return Response(serializer.data)
-                    return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'no service with that id'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return  Response({'detail':'no user with that id or no user id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 class HoodServices(APIView):
 
@@ -640,29 +675,29 @@ class ManageCategs(APIView):
     def get(self, request):
         if request.GET.get('categ_id', None):
             categ_id = request.GET.get('categ_id')
-            categ = Categ.objects.filter(id = categ_id).first()
+            categ = Category.objects.filter(id = categ_id).first()
             #print(categ)
             if categ != None:
                 serializers = CategorySerializer(categ)
                 print(serializers.data)
                 return Response(serializers.data)
-            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no categ with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no categ id provided'}, status=status.HTTP_400_BAD_REQUEST)
                     
 
     def delete(self, request):
         if request.GET.get('categ_id', None):
             categ_id = request.GET.get('categ_id')
-            categ = Categ.objects.filter(id = categ_id).first()
+            categ = Category.objects.filter(id = categ_id).first()
             #print(categ)
             if categ != None:
                 categ.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({'detail':'no hood with that id'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'detail':'no hood id provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail':'no categ with that id'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail':'no categ id provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ManageUser(APIView):
-    permission_classes = (IsSuperuser)
+    permission_classes = (IsSuperuser,)
 
     def post(self, request, format=None):
        
