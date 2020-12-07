@@ -544,8 +544,7 @@ class ManageService(APIView):
         user_id = request.GET.get('user_id')
                 
         user = User.objects.filter(id = user_id).first()
-        print(user)
-        print(user.is_staff)
+        
         all_services = Service.objects.all()
         if user:
             if request.GET.get('hood_id', None):
